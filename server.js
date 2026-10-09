@@ -19,7 +19,7 @@ const tasks = [
 ];
 
 
-app.get('/api/tasks', (req, res) => {
+app.get(['/tasks', '/api/tasks'], (req, res) => {
   let filteredTasks = tasks;
 
   const { completed } = req.query;
@@ -53,7 +53,27 @@ if (search !== undefined) {
 });
 
 
-app.post('/api/tasks', (req, res) => {
+app.get(['/tasks/:id', '/api/tasks/:id'], (req, res) => {
+  const taskId = Number(req.params.id);
+
+  if (!Number.isInteger(taskId) || taskId <= 0) {
+    return res.status(400).json({
+      message: 'Task ID must be a positive integer'
+    });
+  }
+
+  const task = tasks.find(task => task.id === taskId);
+
+  if (!task) {
+    return res.status(404).json({
+      message: 'Task not found'
+    });
+  }
+
+  res.json(task);
+});
+
+app.post(['/tasks', '/api/tasks'], (req, res) => {
   const { title, description, completed } = req.body;
 
   if (typeof title !== 'string' || title.trim() === '') {
@@ -62,23 +82,23 @@ app.post('/api/tasks', (req, res) => {
     });
   }
 
-  if (description !== undefined && typeof description !== 'string') {
+  if (typeof description !== 'string' || description.trim() === '') {
     return res.status(400).json({
-      message: 'Description must be a string'
+      message: 'Description is required and must be a non-empty string'
     });
   }
 
-  if (completed !== undefined && typeof completed !== 'boolean') {
+  if (typeof completed !== 'boolean') {
     return res.status(400).json({
-      message: 'Completed must be a boolean'
+      message: 'Completed is required and must be a boolean'
     });
   }
 
   const newTask = {
     id: tasks.length ? Math.max(...tasks.map(task => task.id)) + 1 : 1,
     title: title.trim(),
-    description: description ?? '',
-    completed: completed ?? false
+    description: description.trim(),
+    completed
   };
 
   tasks.push(newTask);
@@ -86,7 +106,7 @@ app.post('/api/tasks', (req, res) => {
   res.status(201).json(newTask);
 });
 
-app.put('/api/tasks/:id', (req, res) => {
+app.put(['/tasks/:id', '/api/tasks/:id'], (req, res) => {
   const taskId = Number(req.params.id);
   const { title, description, completed } = req.body;
 
@@ -102,15 +122,15 @@ app.put('/api/tasks/:id', (req, res) => {
     });
   }
 
-  if (description !== undefined && typeof description !== 'string') {
+  if (typeof description !== 'string' || description.trim() === '') {
     return res.status(400).json({
-      message: 'Description must be a string'
+      message: 'Description is required and must be a non-empty string'
     });
   }
 
   if (typeof completed !== 'boolean') {
     return res.status(400).json({
-      message: 'Completed must be a boolean'
+      message: 'Completed is required and must be a boolean'
     });
   }
 
@@ -123,13 +143,13 @@ app.put('/api/tasks/:id', (req, res) => {
   }
 
   task.title = title.trim();
-  task.description = description ?? '';
+  task.description = description.trim();
   task.completed = completed;
 
   res.json(task);
 });
 
-app.delete('/api/tasks/:id', (req, res) => {
+app.delete(['/tasks/:id', '/api/tasks/:id'], (req, res) => {
   const taskId = Number(req.params.id);
 
   const taskIndex = tasks.findIndex(task => task.id === taskId);
@@ -161,6 +181,10 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
-});
+if (require.main === module) {
+  app.listen(3000, () => {
+    console.log('Server is running on port 3000');
+  });
+}
+
+module.exports = app;

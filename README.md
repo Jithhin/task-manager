@@ -6,6 +6,7 @@ A simple REST API built using Node.js and Express.js to manage tasks. This proje
 
 - Create a task
 - Retrieve all tasks
+- Retrieve a task by ID
 - Update a task
 - Delete a task
 
@@ -37,28 +38,28 @@ A simple REST API built using Node.js and Express.js to manage tasks. This proje
 Base URL: `http://localhost:3000`
 
 Method      : GET 
-Endpoint    :`/api/tasks`
+Endpoint    :`/tasks`
 Description :Retrieve all tasks 
 
 Method      : GET  
-Endpoint    : `/api/tasks/:id`  
+Endpoint    : `/tasks/:id`  
 Description : Retrieve a task by ID 
  
  Method     : POST  
- Endpoint   : `/api/tasks`  
+ Endpoint   : `/tasks`  
  Description: Create a new task 
  
  Method     : PUT 
- Endpoint   : `/api/tasks/:id` 
+ Endpoint   : `/tasks/:id` 
 Description : Update an existing task 
 
  Method     : DELETE 
- Endpoint   : `/api/tasks/:id` 
+ Endpoint   : `/tasks/:id` 
 Description :  Delete a task 
 
 ##Example Request
 
-Create a task using `POST /api/tasks` with this JSON body:
+Create a task using `POST /tasks` with this JSON body:
 
 ```json
 {
